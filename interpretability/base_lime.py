@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import os
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import re, json, time
 import numpy as np
 import pandas as pd

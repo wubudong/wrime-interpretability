@@ -1,10 +1,12 @@
 
 
 import os
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import pandas as pd
 import numpy as np
 
 from datasets import Dataset
+from datasets.utils.logging import disable_progress_bar
 from fugashi import Tagger
 
 from transformers import (
@@ -33,6 +35,7 @@ LR = 1e-5
 SEED = 42
 acc_metric = evaluate.load("accuracy")
 tagger = Tagger()
+disable_progress_bar()
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred

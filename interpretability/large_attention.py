@@ -11,6 +11,7 @@ from pathlib import Path
 
 
 import os, re, json, time
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import numpy as np
 import pandas as pd
 import torch

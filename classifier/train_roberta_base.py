@@ -1,10 +1,12 @@
 
 import os
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import numpy as np
 import pandas as pd
 
 import evaluate
 from datasets import Dataset
+from datasets.utils.logging import disable_progress_bar
 from fugashi import Tagger
 
 import torch
@@ -33,6 +35,7 @@ LR = 5e-5
 SEED = 42
 acc_metric = evaluate.load("accuracy")
 tagger = Tagger()
+disable_progress_bar()
 
 def wakachi_space(text: str) -> str:
     return " ".join([w.surface for w in tagger(str(text))])

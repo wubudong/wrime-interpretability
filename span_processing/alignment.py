@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import json
 import torch
 import torch.nn as nn

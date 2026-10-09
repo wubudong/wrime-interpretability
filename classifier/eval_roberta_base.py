@@ -4,6 +4,7 @@ from pathlib import Path
 
 import json
 import os
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 import re
 
 import pandas as pd
