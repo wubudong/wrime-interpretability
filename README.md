@@ -4,11 +4,11 @@ All scripts use seed 42.
 
 ## Functions
 
-- `classifier/train_bilstm.py`, `classifier/train_roberta_base.py`, `classifier/train_roberta_large.py` trains the three sentiment classifiers.
-- `extractor/train_extractor.py` trains the XLM R and CRF span extractor.
+- `classifier/train_bilstm.py`, `classifier/train_roberta_base.py`, `classifier/train_roberta_large.py` train the three sentiment classifiers.
+- `extractor/train_extractor.py` trains the XLM-R and CRF span extractor.
 - `span_processing/alignment.py` predicts and aligns spans.
 - `span_processing/pairing.py` pairs aspect and opinion spans.
-- `classifier/eval_bilstm.py`, `classifier/eval_roberta_base.py`, `classifier/eval_roberta_large.py` evaluates classifier accuracy.
+- `classifier/eval_bilstm.py`, `classifier/eval_roberta_base.py`, `classifier/eval_roberta_large.py` evaluate classifier accuracy.
 - `interpretability` runs ATT, IG, and LIME evaluation.
 
 ## Data

@@ -54,11 +54,6 @@ UNK = "<unk>"
 
 
 
-DEBUG = True
-DEBUG_MAX_EX = 20
-DEBUG_WINDOWS = [0, 1, 2, 3 ]
-DEBUG_SEED = 42
-DEBUG_SAMPLE_PROB = 0.05
 
 
 
@@ -556,7 +551,6 @@ def predict_proba_words_batch(model, stoi, sequences):
 
 
 def main():
-    rng = np.random.RandomState(DEBUG_SEED)
 
 
     ckpt = torch.load(MODEL_PATH, map_location=DEVICE)
@@ -598,15 +592,10 @@ def main():
     f1_wt1, map_wt1 = [], []
     records = []
 
-    n_total = 0
     miss_spred_o = 0
     miss_spred_p = 0
 
 
-    win_delta_max = {w: [] for w in DEBUG_WINDOWS}
-    win_topk_change = {w: [] for w in DEBUG_WINDOWS}
-    win_map_change = {w: [] for w in DEBUG_WINDOWS}
-    debug_printed = 0
 
     for idx, row in df.iterrows():
         ex_id = int(row["id"])
@@ -695,31 +684,6 @@ def main():
         Xo_wt1 = sort_tokens_by_scores(tokens_o[:len_o], wt1_o)[:k_o]
         Xp_wt1 = sort_tokens_by_scores(tokens_p[:len_p], wt1_p)[:k_p]
         map_wt1.append(compute_ranking_map(Xo_wt1, Xp_wt1))
-
-
-        if DEBUG:
-            wt_base_o = apply_weighting_ws_dilate(w0_o, s_o, h=H_CONST, window=0)
-            wt_base_p = apply_weighting_ws_dilate(w0_p, s_p, h=H_CONST, window=0)
-
-            pred_base_o = topk_indices(wt_base_o, k_o)
-            Xo_base = sort_tokens_by_scores(tokens_o[:len_o], wt_base_o)[:k_o]
-            Xp_base = sort_tokens_by_scores(tokens_p[:len_p], wt_base_p)[:k_p]
-            map_base = compute_ranking_map(Xo_base, Xp_base)
-
-            for w in DEBUG_WINDOWS:
-                wt_w_o = apply_weighting_ws_dilate(w0_o, s_o, h=H_CONST, window=w)
-                wt_w_p = apply_weighting_ws_dilate(w0_p, s_p, h=H_CONST, window=w)
-
-                dmax = float(np.max(np.abs(wt_w_o - wt_base_o)))
-                win_delta_max[w].append(dmax)
-
-                pred_w_o = topk_indices(wt_w_o, k_o)
-                win_topk_change[w].append(1 if pred_w_o != pred_base_o else 0)
-
-                Xo_w = sort_tokens_by_scores(tokens_o[:len_o], wt_w_o)[:k_o]
-                Xp_w = sort_tokens_by_scores(tokens_p[:len_p], wt_w_p)[:k_p]
-                map_w = compute_ranking_map(Xo_w, Xp_w)
-                win_map_change[w].append(1 if abs(map_w - map_base) > 1e-12 else 0)
 
 
         gold_sets_oracle_o = build_gold_sets_paired_strict(
@@ -854,7 +818,6 @@ def main():
             record[f"comprehensiveness_{setting_name}"] = values["comprehensiveness"]
         records.append(record)
 
-        n_total += 1
 
 
     save_extended_results(records)
@@ -865,16 +828,6 @@ def main():
     print("ws_f1", np.mean(f1_wt1)*100, "ws_map", np.mean(map_wt1)*100, "n", len(f1_wt1))
     print("miss_o", miss_spred_o, "miss_p", miss_spred_p)
 
-
-    if DEBUG:
-        for w in DEBUG_WINDOWS:
-            dm = np.array(win_delta_max[w], dtype=np.float64)
-            tc = np.array(win_topk_change[w], dtype=np.float64)
-            mc = np.array(win_map_change[w], dtype=np.float64)
-            if len(dm) == 0:
-                continue
-            p95 = float(np.quantile(dm, 0.95))
-            print("window", w, "dmax_mean", dm.mean(), "dmax_p95", p95, "topk_change_rate", tc.mean(), "map_change_rate", mc.mean())
 
 if __name__ == "__main__":
     main()
